@@ -11,7 +11,8 @@ module APN
       
       def initialize(opts = {})
         @opts = opts
-
+        @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
+        
         setup_logger
         log(:info, "APN::Sender initializing. Establishing connections first...") if @opts[:verbose]
         setup_paths
@@ -65,14 +66,13 @@ module APN
       # Get a fix on the .pem certificate we'll be using for SSL
       def setup_paths
         # Set option defaults
-        @opts[:cert_path] ||= File.join(File.expand_path(RAILS_ROOT), "config", "certs") if defined?(RAILS_ROOT)
-        @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
+        unless @opts[:cert_full_path]
+          @opts[:cert_path] ||= File.join(File.expand_path(Rails.root), "config", "certs") if defined?(Rails.root)
+          @opts[:cert_filename] ||= "apn_#{@opts[:environment]}.pem"
+        end
         
-        log_and_die("Missing certificate path. Please specify :cert_path when initializing class.") unless @opts[:cert_path]
+        cert_path = @opts[:cert_full_path] ? @opts[:cert_full_path] : File.join(@opts[:cert_path], @opts[:cert_filename])
         
-        cert_name = apn_production? ? "apn_production.pem" : "apn_development.pem"
-        cert_path = File.join(@opts[:cert_path], cert_name)
-
         @apn_cert = File.exists?(cert_path) ? File.read(cert_path) : nil
         log_and_die("Missing apple push notification certificate in #{cert_path}") unless @apn_cert
       end
