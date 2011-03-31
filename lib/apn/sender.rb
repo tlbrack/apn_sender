@@ -7,7 +7,7 @@ module APN
   # which they apparently view as a DOS attack.
   #
   # Accepts <code>:environment</code> (production vs anything else) and <code>:cert_path</code> options on initialization.  If called in a 
-  # Rails context, will default to RAILS_ENV and RAILS_ROOT/config/certs. :environment will default to development.  
+  # Rails context, will default to Rails.env and Rails.root/config/certs. :environment will default to development.  
   # APN::Sender expects two files to exist in the specified <code>:cert_path</code> directory: 
   # <code>apn_production.pem</code> and <code>apn_development.pem</code>.
   #

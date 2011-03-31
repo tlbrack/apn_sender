@@ -11,7 +11,7 @@ module APN
       
       def initialize(opts = {})
         @opts = opts
-        @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
+        @opts[:environment] ||= Rails.env if defined?(Rails.env)
         
         setup_logger
         log(:info, "APN::Sender initializing. Establishing connections first...") if @opts[:verbose]
@@ -32,8 +32,8 @@ module APN
       def setup_logger
         @logger = if defined?(Merb::Logger)
           Merb.logger
-        elsif defined?(RAILS_DEFAULT_LOGGER)
-          RAILS_DEFAULT_LOGGER
+        elsif defined?(Rails.logger)
+          Rails.logger
         end
       end
       
