@@ -16,7 +16,7 @@ module APN
         log(:info, "APN::Sender initializing. Establishing connections first...") if @opts[:verbose]
         setup_paths
 
-        super( APN::QUEUE_NAME ) if self.class.ancestors.include?(Resque::Worker)
+        super( "apn_" + @opts[:app] ) if self.class.ancestors.include?(Resque::Worker)
       end
       
       # Lazy-connect the socket once we try to access it in some way

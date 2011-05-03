@@ -41,6 +41,9 @@ module APN
         opts.on('-d', '--delay=D', "Delay between rounds of work (seconds)") do |d|
           @options[:delay] = d
         end
+        opts.on('-a', '--app=NAME', 'Specifies the application for this apn_sender') do |a|
+          @options[:app] = a
+        end
       end
       
       # If no arguments, give help screen
