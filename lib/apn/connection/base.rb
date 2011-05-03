@@ -71,7 +71,7 @@ module APN
         log_and_die("Missing certificate path. Please specify :cert_path when initializing class.") unless @opts[:cert_path]
         
         cert_name = apn_production? ? "apn_production.pem" : "apn_development.pem"
-        cert_path = File.join(@opts[:cert_path], cert_name)
+        cert_path = File.join(@opts[:cert_path], @opts[:app], cert_name)
 
         @apn_cert = File.exists?(cert_path) ? File.read(cert_path) : nil
         log_and_die("Missing apple push notification certificate in #{cert_path}") unless @apn_cert
