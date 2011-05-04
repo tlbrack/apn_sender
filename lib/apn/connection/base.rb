@@ -75,6 +75,7 @@ module APN
 
         @apn_cert = File.exists?(cert_path) ? File.read(cert_path) : nil
         
+        log(:info, "Cert path is #{cert_path}")
         log(:info, "Cert found") if @apn_cert
         
         log_and_die("Missing apple push notification certificate in #{cert_path}") unless @apn_cert
