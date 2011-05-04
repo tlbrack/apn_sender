@@ -10,8 +10,8 @@ module APN
       attr_accessor :opts, :logger
       
       def initialize(opts = {})
-        @opts = opts
-
+        @opts = opts             
+        
         setup_logger
         log(:info, "APN::Sender initializing. Establishing connections first...") if @opts[:verbose]
         setup_paths
@@ -23,8 +23,8 @@ module APN
       def socket
         setup_connection unless @socket
         return @socket
-      end
-            
+      end     
+      
       protected
       
       # Default to Rails or Merg logger, if available

@@ -60,7 +60,7 @@ module APN
       end
     end
     
-    def run(worker_name = nil)
+    def run(worker_name = nil)            
       logger = Logger.new(File.join(::RAILS_ROOT, 'log', 'apn_sender.log'))
       
       worker = APN::Sender.new(@options)
