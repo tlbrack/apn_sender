@@ -47,6 +47,7 @@ module APN
       def log(level, message = nil)
         level, message = 'info', level if message.nil? # Handle only one argument if called from Resque, which expects only message
 
+        STDOUT.puts message
         return false unless self.logger && self.logger.respond_to?(level)
         self.logger.send(level, "#{Time.now}: #{message}")
       end
