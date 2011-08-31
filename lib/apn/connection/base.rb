@@ -29,8 +29,9 @@ module APN
 
       # Default to Rails or Merg logger, if available
       def setup_logger
-        @logger = if defined?(::Merb::Logger)
-          ::Merb.logger
+	# HiroProt changed from ::Merb::Logger to Merb::Logger, so I'm taking his word for it
+        @logger = if defined?(Merb::Logger)
+          Merb.logger
         elsif defined?(::Rails.logger)
           ::Rails.logger
         end
@@ -66,7 +67,7 @@ module APN
       # Get a fix on the .pem certificate we'll be using for SSL
       def setup_paths
         # Set option defaults
-        @opts[:cert_path] ||= File.join(File.expand_path(RAILS_ROOT), "config", "certs") if defined?(RAILS_ROOT)
+        @opts[:cert_path] ||= File.join(File.expand_path(::Rails.root.to_s), "config", "certs") if defined?(::Rails.root.to_s)
         @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
         
         log_and_die("Missing certificate path. Please specify :cert_path when initializing class.") unless @opts[:cert_path]
@@ -90,7 +91,12 @@ module APN
 
         ctx = OpenSSL::SSL::SSLContext.new
         ctx.cert = OpenSSL::X509::Certificate.new(@apn_cert)
-        ctx.key = OpenSSL::PKey::RSA.new(@apn_cert)
+        
+        if @opts[:cert_pass]
+          ctx.key = OpenSSL::PKey::RSA.new(@apn_cert, @opts[:cert_pass])
+        else
+          ctx.key = OpenSSL::PKey::RSA.new(@apn_cert)
+        end
 
         @socket_tcp = TCPSocket.new(apn_host, apn_port)
         @socket = OpenSSL::SSL::SSLSocket.new(@socket_tcp, ctx)

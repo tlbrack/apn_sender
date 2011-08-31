@@ -29,8 +29,8 @@ module APN
         opts.on('--cert-path=NAME', 'Path to directory containing apn .pem certificates.') do |path|
           @options[:cert_path] = path
         end
-        opts.on('c', '--full-cert-path=NAME', 'Full path to desired .pem certificate (overrides environment selector).') do |path|
-          @options[:full_cert_path] = path
+        opts.on('--cert-pass=PASSWORD', 'Password for the apn .pem certificates.') do |pass|
+          @options[:cert_pass] = pass
         end
         opts.on('-n', '--number-of-workers=WORKERS', "Number of unique workers to spawn") do |worker_count|
           @options[:worker_count] = worker_count.to_i rescue 1
