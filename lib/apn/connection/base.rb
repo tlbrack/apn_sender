@@ -69,7 +69,7 @@ module APN
       def setup_paths
         # Set option defaults
         @opts[:cert_path] ||= File.join(File.expand_path(::Rails.root.to_s), "config", "certs") if defined?(::Rails.root.to_s)
-        @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
+        @opts[:environment] ||= Rails.env if defined?(Rails.env)
         
         cert_name = apn_production? ? "apn_production.pem" : "apn_development.pem"
         cert_path = File.join(@opts[:cert_path], @opts[:app], cert_name)
