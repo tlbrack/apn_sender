@@ -11,6 +11,7 @@ module APN
 
       def initialize(opts = {})
         @opts = opts             
+        @opts[:environment] ||= Rails.env if defined?(Rails.env)
         
         setup_logger
         log(:info, "APN::Sender initializing. Establishing connections first...") if @opts[:verbose]
@@ -32,8 +33,8 @@ module APN
 	# HiroProt changed from ::Merb::Logger to Merb::Logger, so I'm taking his word for it
         @logger = if defined?(Merb::Logger)
           Merb.logger
-        elsif defined?(::Rails.logger)
-          ::Rails.logger
+        elsif defined?(Rails.logger)
+          Rails.logger
         end
       end
 
@@ -69,8 +70,6 @@ module APN
         # Set option defaults
         @opts[:cert_path] ||= File.join(File.expand_path(::Rails.root.to_s), "config", "certs") if defined?(::Rails.root.to_s)
         @opts[:environment] ||= RAILS_ENV if defined?(RAILS_ENV)
-        
-        log_and_die("Missing certificate path. Please specify :cert_path when initializing class.") unless @opts[:cert_path]
         
         cert_name = apn_production? ? "apn_production.pem" : "apn_development.pem"
         cert_path = File.join(@opts[:cert_path], @opts[:app], cert_name)
