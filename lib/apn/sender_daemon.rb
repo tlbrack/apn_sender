@@ -44,6 +44,9 @@ module APN
         opts.on('-d', '--delay=D', "Delay between rounds of work (seconds)") do |d|
           @options[:delay] = d
         end
+        opts.on('-a', '--app=NAME', 'Specifies the application for this apn_sender') do |a|
+          @options[:app] = a
+        end
       end
 
       # If no arguments, give help screen
@@ -61,6 +64,7 @@ module APN
     end
 
     def run(worker_name = nil)
+	# ::Rails.root seems to be the newer way
       logger = Logger.new(File.join(::Rails.root, 'log', 'apn_sender.log'))
 
       worker = APN::Sender.new(@options)
