@@ -19,6 +19,11 @@ This is updated to be able to run multiple queues of Apple Push Notifications ea
 
 I didn't check if the certificate passwords work yet
 
+
+As far as I can tell, seriously, the rails environment is barely even necessary other than to find a place to put the logs, and a place to get the certificates.  I wonder if we can reduce memory usage by nuking the entire rails reference and throwing in more command line switches or config files.
+
+To keep things small for me, I just make a "blank" rails project and throw all my certs and apn scripts in there.  APN doesn't access your rails models by default anyways, nor does it use your DB, as it runs everything through redis
+
 == Older Status
 This gem has been in production use since early May, 2010.  There are no guarantees of complete functionality, of course, but it's working for us. :)
 ** UPDATE: our site is now defunct (for completely-unrelated reasons), but the many forks and watchers make me think something's going right. **
