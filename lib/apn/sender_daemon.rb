@@ -70,7 +70,7 @@ module APN
     def run(worker_name = nil)
       # ::Rails.root seems to be the newer way
       #puts File.join(::Rails.root, 'log', 'apn_sender.log')
-      logger = Logger.new(File.join(::Rails.root, 'log', 'apn_sender.log'))
+      logger = Logger.new(File.join(::Rails.root, 'log', "#{worker_name}.apnlog"))
       worker = APN::Sender.new(@options)
       worker.logger = logger
       worker.verbose = @options[:verbose]
