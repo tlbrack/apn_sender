@@ -14,10 +14,14 @@ module APN
         @opts[:environment] ||= Rails.env if defined?(Rails.env)
         
         setup_logger
-        log(:info, "APN::Sender initializing. Establishing connections first...") if @opts[:verbose]
+        log(:info, "APN::Sender initializing for app = #{@opts[:app]} for environgment = #{@opts[:environment]}. Establishing connections first...") if @opts[:verbose]
+
+	#log(:info, "setup_paths")
         setup_paths
 
+	#puts "super start"
         super( "apn_" + @opts[:app] ) if self.class.ancestors.include?(Resque::Worker)
+	#puts "super end"
       end
 
       # Lazy-connect the socket once we try to access it in some way
@@ -49,9 +53,12 @@ module APN
       def log(level, message = nil)
         level, message = 'info', level if message.nil? # Handle only one argument if called from Resque, which expects only message
 
-        STDOUT.puts message
+        #STDOUT.puts message + "!L!"
         return false unless self.logger && self.logger.respond_to?(level)
-        self.logger.send(level, "#{Time.now}: #{message}")
+        #STDOUT.puts "after false" + "!L!"
+	# not sure why logger isn't getting setup properly
+        #self.logger.send(level, "#{Time.now}: #{message}")
+        #STDOUT.puts "after time" + "!L!"
       end
 
       # Log the message first, to ensure it reports what went wrong if in daemon mode.
@@ -67,9 +74,12 @@ module APN
 
       # Get a fix on the .pem certificate we'll be using for SSL
       def setup_paths
+        log(:info, "setup_paths start!")
         # Set option defaults
         @opts[:cert_path] ||= File.join(File.expand_path(::Rails.root.to_s), "config", "certs") if defined?(::Rails.root.to_s)
+        log(:info, ":cert_path #{@opts[:cert_path]}!")
         @opts[:environment] ||= Rails.env if defined?(Rails.env)
+        log(:info, ":environment #{@opts[:environment]}!")
         
         cert_name = apn_production? ? "apn_production.pem" : "apn_development.pem"
         cert_path = File.join(@opts[:cert_path], @opts[:app], cert_name)

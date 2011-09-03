@@ -21,6 +21,9 @@ module APN
 
         opts.on('-h', '--help', 'Show this message') do
           puts opts
+		
+		# needs: require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+		puts "Current Detected Rails.root #{::Rails.root}"
           exit 1
         end
         opts.on('-e', '--environment=NAME', 'Specifies the environment to run this apn_sender under ([development]/production).') do |e|
@@ -57,6 +60,7 @@ module APN
     def daemonize
       @options[:worker_count].times do |worker_index|
         process_name = @options[:worker_count] == 1 ? "apn_sender" : "apn_sender.#{worker_index}"
+        #puts "#{::Rails.root}/tmp/pids"
         Daemons.run_proc(process_name, :dir => "#{::Rails.root}/tmp/pids", :dir_mode => :normal, :ARGV => @args) do |*args|
           run process_name
         end
@@ -64,7 +68,8 @@ module APN
     end
 
     def run(worker_name = nil)
-	# ::Rails.root seems to be the newer way
+      # ::Rails.root seems to be the newer way
+      #puts File.join(::Rails.root, 'log', 'apn_sender.log')
       logger = Logger.new(File.join(::Rails.root, 'log', 'apn_sender.log'))
       worker = APN::Sender.new(@options)
       worker.logger = logger
