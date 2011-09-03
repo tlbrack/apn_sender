@@ -59,7 +59,7 @@ module APN
 
     def daemonize
       @options[:worker_count].times do |worker_index|
-        process_name = @options[:worker_count] == 1 ? "apn_sender" : "apn_sender.#{worker_index}"
+        process_name = @options[:worker_count] == 1 ? "apn_sender.#{@options[:app]}" : "apn_sender.#{@options[:app]}.#{worker_index}"
         #puts "#{::Rails.root}/tmp/pids"
         Daemons.run_proc(process_name, :dir => "#{::Rails.root}/tmp/pids", :dir_mode => :normal, :ARGV => @args) do |*args|
           run process_name
