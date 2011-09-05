@@ -22,7 +22,10 @@ module APN
         setup_paths
 
 	#puts "super start"
-        super( "apn_" + @opts[:app] ) if self.class.ancestors.include?(Resque::Worker)
+	#puts "determines queuename monitored"
+	qname = "apn_" + "#{@opts[:app]}.#{@opts[:environment]}" 
+	log(:info, "monitoring redis queue: #{qname}")
+        super( qname ) if self.class.ancestors.include?(Resque::Worker)
 	#puts "super end"
       end
 
