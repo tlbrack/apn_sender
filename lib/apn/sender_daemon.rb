@@ -22,8 +22,6 @@ module APN
         opts.on('-h', '--help', 'Show this message') do
           puts opts
 		
-		# needs: require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-		puts "Current Detected Rails.root #{::Rails.root}"
           exit 1
         end
         opts.on('-e', '--environment=NAME', 'Specifies the environment to run this apn_sender under ([development]/production).') do |e|
@@ -50,18 +48,34 @@ module APN
         opts.on('-a', '--app=NAME', 'Specifies the application for this apn_sender') do |a|
           @options[:app] = a
         end
+	opts.on('-m', '--multiapp', 'Loop through all certs found in cert-path/<bundleid>/apn_[development|production].pem (not finished)') do |a|
+          @options[:multiapp] = true
+        end
+	opts.on('-b', '--basedir=BASEDIR', 'Directory containing certs/*, logs/*, and tmp/pids/* (rather than using ::Rails.root)') do |dir|
+          @options[:base_dir] = dir
+        end
       end
 
       # If no arguments, give help screen
       @args = optparse.parse!(args.empty? ? ['-h'] : args)
       @options[:verbose] = true if @options[:very_verbose]
+      @options[:base_dir] ||= ::Rails.root
+      @options[:environment] ||= "development"
+   
+      if @options[:verbose]
+	puts ":environment = #{@options[:environment]}"
+	puts ":base_dir = #{@options[:base_dir]}"
+	puts ":app = #{@options[:app]}"
+      end
     end
 
+
+    # TODO: I'm guessing a modification on this function would allow it to launch a daemon for each certificate and queue for every application bundle_id/certificate of interest.  Just gotta loop through each available certificate, setting @options[:app], @options[:environment] (which may vary from cert to cert)  and @options[:certpath] and launching the Daemon.
     def daemonize
       @options[:worker_count].times do |worker_index|
-        process_name = @options[:worker_count] == 1 ? "apn_sender.#{@options[:app]}" : "apn_sender.#{@options[:app]}.#{worker_index}"
+        process_name = @options[:worker_count] == 1 ? "apn_sender.#{@options[:app]}.#{@options[:environment]}" : "apn_sender.#{@options[:app]}.#{@options[:environment]}.#{worker_index}"
         #puts "#{::Rails.root}/tmp/pids"
-        Daemons.run_proc(process_name, :dir => "#{::Rails.root}/tmp/pids", :dir_mode => :normal, :ARGV => @args) do |*args|
+        Daemons.run_proc(process_name, :dir => "#{@options[:base_dir]}/tmp/pids", :dir_mode => :normal, :ARGV => @args) do |*args|
           run process_name
         end
       end
@@ -70,7 +84,12 @@ module APN
     def run(worker_name = nil)
       # ::Rails.root seems to be the newer way
       #puts File.join(::Rails.root, 'log', 'apn_sender.log')
-      logger = Logger.new(File.join(::Rails.root, 'log', "#{worker_name}.apnlog"))
+      logfile = File.join(@options[:base_dir], 'log', "#{worker_name}.apnlog")
+      logger = Logger.new(logfile)
+      if @options[:verbose]
+	      puts "logfile: #{logfile}"
+      end
+      #logger = Logger.new(File.join(@options[:base_dir], 'log', "#{worker_name}.apnlog"))
       worker = APN::Sender.new(@options)
       worker.logger = logger
       worker.verbose = @options[:verbose]

@@ -11,7 +11,9 @@ module APN
 
       def initialize(opts = {})
         @opts = opts             
-        @opts[:environment] ||= Rails.env if defined?(Rails.env)
+	
+	# should have already taken care of this earlier
+        #@opts[:environment] ||= Rails.env if defined?(Rails.env)
         
         setup_logger
         log(:info, "APN::Sender initializing for app = #{@opts[:app]} for environgment = #{@opts[:environment]}. Establishing connections first...") if @opts[:verbose]
@@ -74,22 +76,36 @@ module APN
 
       # Get a fix on the .pem certificate we'll be using for SSL
       def setup_paths
-        log(:info, "setup_paths start!")
+        log(:info, "setup_paths start! #{@opts}")
         # Set option defaults
-        @opts[:cert_path] ||= File.join(File.expand_path(::Rails.root.to_s), "config", "certs") if defined?(::Rails.root.to_s)
-        log(:info, ":cert_path #{@opts[:cert_path]}!")
         @opts[:environment] ||= Rails.env if defined?(Rails.env)
         log(:info, ":environment #{@opts[:environment]}!")
-        
+
+
+
         cert_name = apn_production? ? "apn_production.pem" : "apn_development.pem"
-        cert_path = File.join(@opts[:cert_path], @opts[:app], cert_name)
+
+        #@opts[:cert_path] ||= File.join(File.expand_path(::Rails.root.to_s), "config", "certs") if defined?(::Rails.root.to_s)
+        @opts[:cert_path] ||= File.join(File.expand_path(@opts[:base_dir]), "config", "certs") 
+	if defined?(@opts[:base_dir])
+		if defined?(@opts[:app])
+			cert_path = File.join(@opts[:cert_path], @opts[:app], cert_name)
+		else
+			cert_path = File.join(@opts[:cert_path], cert_name)
+		end
+	else
+		log_and_die("base_dir is not set")
+	end
+        
 
         @apn_cert = File.exists?(cert_path) ? File.read(cert_path) : nil
-        
         log(:info, "Cert path is #{cert_path}")
-        log(:info, "Cert found") if @apn_cert
-        
-        log_and_die("Missing apple push notification certificate in #{cert_path}") unless @apn_cert
+
+	if @apn_cert
+		log(:info, "Cert found") 
+	else
+		log_and_die("Missing apple push notification certificate in #{cert_path}") unless @apn_cert
+	end
       end
 
       # Open socket to Apple's servers

@@ -6,8 +6,14 @@
 # start daemon
 #   Development Certificate in: /home/user/railsapp/config/certs/<application.bundle.id>/apn_development.pem  
 #   Production Certificate in: /home/user/railsapp/config/certs/<application.bundle.id>/apn_production.pem  
-script/apn_sender --environment=development --verbose -a application.bundle.id --cert-path=/home/user/railsapp/config/certs start
+script/apn_sender --environment=development --verbose -a application.bundle.id \
+		--basedir=/home/user/railsapp \
+		--cert-path=/home/user/railsapp/config/certs start
 
 # run in foreground
 #script/apn_sender --environment=development --verbose -a application.bundle.id --cert-path=/home/user/railsapp/config/certs start
 
+# how to stop
+#script/apn_sender --environment=development --verbose -a application.bundle.id \
+#		--basedir=/home/user/railsapp \
+#		--cert-path=/home/user/railsapp/config/certs stop

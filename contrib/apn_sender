@@ -4,19 +4,24 @@
 #  Copy into rails.root/script/apn_sender
 
 
+# not used any more
 # This is how we used to do it
 # Daemons sets pwd to /, so we have to explicitly set RAILS_ROOT
 #RAILS_ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
+# not used any more
 # maybe this is better, but I have a feeling it's not really being used by the gem anyways
-ENV['RAILS_ENV'] = ENV['RAILS_ENV'] || 'development'
+# ENV['RAILS_ENV'] = ENV['RAILS_ENV'] || 'development'
 
 
 # import the rails environment
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+# not used any more
+#require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 
 # import gems
 require 'rubygems'
+require "bundler/setup"
+
 
 # Use system gems
 require 'apn'
