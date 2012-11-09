@@ -1,4 +1,6 @@
 module APN
+  require 'json' 
+
   # Encapsulates the logic necessary to convert an iPhone token and an array of options into a string of the format required
   # by Apple's servers to send the notification.  Much of the processing code here copied with many thanks from
   # http://github.com/samsoffes/apple_push_notification/blob/master/lib/apple_push_notification.rb
@@ -28,7 +30,11 @@ module APN
       @options = hash_as_symbols(opts.is_a?(Hash) ? opts : {:alert => opts})
       @token = token
 
-      raise "The maximum size allowed for a notification payload is 256 bytes." if packaged_notification.size.to_i > 256
+      raise "The maximum size allowed for a notification payload is 256 bytes. You have #{packaged_notification.size.to_i} bytes." if packaged_notification.size.to_i > 256
+    end
+
+    def package_size
+	packaged_notification.size.to_i 
     end
 
     def to_s
@@ -67,7 +73,8 @@ module APN
         hsh['aps']['sound'] = sound.is_a?(TrueClass) ? 'default' : sound.to_s
       end
       hsh.merge!(opts)
-      ActiveSupport::JSON::encode(hsh)
+	# ActiveSupport::JSON::encode(hsh) # Ruby 1.8 Style rely on ActiveSupport, but unicode characters like 가 unnecessarilly expanded to like \\u1234 and take too much space
+      JSON.generate(hsh)
     end
     
     # Symbolize keys, using ActiveSupport if available
