@@ -7,9 +7,9 @@ module Resque
 
     # Wrapper for original unregister_worker method which adds a before hook +before_unregister_worker+
     # to be executed if present.
-    def unregister_worker
+    def unregister_worker(exception = nil)
       run_hook(:before_unregister_worker, self) 
-      unregister_worker_without_before_hook
+      unregister_worker_without_before_hook(exception)
     end
     
     
@@ -18,12 +18,14 @@ module Resque
     # how to make this more flexible are more than welcome.
     def run_hook(name, *args)
       # return unless hook = Resque.send(name)
-      return unless hook = APN::QueueManager.send(name)
-      msg = "Running #{name} hook"
+      return unless hooks = APN::QueueManager.send(name)
+      msg = "Running #{name} hooks"
       msg << " with #{args.inspect}" if args.any?
       log msg
 
-      args.any? ? hook.call(*args) : hook.call
+      hooks.each do |hook|
+        args.any? ? hook.call(*args) : hook.call
+      end
     end
     
   end

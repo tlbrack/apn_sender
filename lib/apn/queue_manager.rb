@@ -15,12 +15,12 @@ module APN
     extend Resque
 
     def self.before_unregister_worker(&block)
-      block ? (@before_unregister_worker = block) : @before_unregister_worker
+      block ? register_hook(:before_unregister_worker, block) : hooks(:before_unregister_worker)
     end
 
-    def self.before_unregister_worker=(before_unregister_worker)
-      @before_unregister_worker = before_unregister_worker
-    end
+    def self.before_unregister_worker=(block)
+      register_hook(:before_unregister_worker, block)
+    end      
 
     def self.to_s
       "APN::QueueManager (Resque Client) connected to #{redis.server}"
