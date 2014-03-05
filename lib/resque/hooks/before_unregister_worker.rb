@@ -17,8 +17,13 @@ module Resque
     # APN::QueueManager rather on Resque directly. Any suggestions on
     # how to make this more flexible are more than welcome.
     def run_hook(name, *args)
-      # return unless hook = Resque.send(name)
+      # gives custom APN::QueueManager hook(s) a chance to be found before looking at Resque
       return unless hooks = APN::QueueManager.send(name)
+
+      if hooks.blank?
+        return unless hooks = Resque.send(name)
+      end
+
       msg = "Running #{name} hooks"
       msg << " with #{args.inspect}" if args.any?
       log msg
