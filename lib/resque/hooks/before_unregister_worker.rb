@@ -20,7 +20,7 @@ module Resque
       # gives custom APN::QueueManager hook(s) a chance to be found before looking at Resque
       return unless hooks = APN::QueueManager.send(name)
 
-      if hooks.blank?
+      if hooks.empty?
         return unless hooks = Resque.send(name)
       end
 
